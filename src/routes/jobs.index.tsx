@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { JobCard } from "@/components/jobs/JobCard";
 import { EmptyState } from "@/components/common/EmptyState";
+import { PageHeader } from "@/components/common/PageHeader";
 import { computeMatch } from "@/lib/match";
 import { cn } from "@/lib/utils";
 
@@ -85,13 +86,13 @@ function typeLabel(t: string) {
 /** Active-filter chip — shows a dismissible pill for each applied filter. */
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-primary/8 px-2.5 py-0.5 text-xs font-medium text-primary">
+    <span className="inline-flex items-center gap-1 rounded-[2px] border border-primary/25 bg-primary/8 px-2.5 py-0.5 text-xs font-medium text-primary">
       {label}
       <button
         type="button"
         onClick={onRemove}
         aria-label={`Remove ${label} filter`}
-        className="ml-0.5 rounded-full hover:bg-primary/15 p-0.5"
+        className="ml-0.5 rounded-[2px] hover:bg-primary/15 p-0.5"
       >
         <X className="h-2.5 w-2.5" />
       </button>
@@ -302,6 +303,12 @@ function JobsPage() {
 
   return (
     <div className="portal-bg min-h-screen page-fade">
+      {/* ── Dark page header ───────────────────────────────────────────── */}
+      <PageHeader
+        title="Job List"
+        breadcrumbs={[{ label: "Job List" }]}
+      />
+
       {/* ── Sticky search + filter bar ─────────────────────────────────── */}
       <div className="sticky top-16 z-20 border-b bg-background/95 backdrop-blur-sm">
         <div className="container mx-auto px-4">
@@ -411,7 +418,7 @@ function JobsPage() {
         <div className="flex gap-6">
           {/* Desktop sidebar filters */}
           <aside className="hidden md:block w-56 shrink-0">
-            <div className="sticky top-36 rounded-xl border bg-card p-5" style={{ boxShadow: "var(--shadow-card-val)" }}>
+            <div className="sticky top-36 rounded-[2px] border bg-card p-5" style={{ boxShadow: "var(--shadow-card-val)" }}>
               {FilterPanel}
             </div>
           </aside>

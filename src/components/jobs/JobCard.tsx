@@ -1,9 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Bookmark, BookmarkCheck, Clock } from "lucide-react";
+import {
+  MapPin,
+  Bookmark,
+  BookmarkCheck,
+  Clock,
+  Briefcase,
+  DollarSign,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CompanyAvatar } from "@/components/common/CompanyAvatar";
 import { formatSalary, timeAgo } from "@/lib/format";
 import { matchTone } from "@/lib/match";
 import { cn } from "@/lib/utils";
@@ -28,11 +32,9 @@ interface JobCardProps {
   matchScore?: number | null;
   isSaved?: boolean;
   onToggleSave?: (jobId: string) => void;
-  /** Compact mode — used in dashboard sidebars */
   compact?: boolean;
 }
 
-/** Maps job type string → badge label. */
 function typeLabel(type: string) {
   const map: Record<string, string> = {
     "full-time": "Full-time",
@@ -45,17 +47,15 @@ function typeLabel(type: string) {
   return map[type] ?? type;
 }
 
-/** Match score pill with color coding. */
 function MatchPill({ score }: { score: number }) {
   const tone = matchTone(score);
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums",
-        tone === "good" &&
-          "bg-success/12 text-success dark:bg-success/15",
+        "inline-flex items-center rounded-[2px] px-2 py-0.5 text-[11px] font-semibold tabular-nums",
+        tone === "good" && "bg-success/12 text-success",
         tone === "warn" &&
-          "bg-warning/12 text-warning-foreground dark:bg-warning/15 dark:text-warning",
+          "bg-warning/12 text-warning-foreground dark:text-warning",
         tone === "muted" && "bg-muted text-muted-foreground",
       )}
     >
@@ -64,116 +64,147 @@ function MatchPill({ score }: { score: number }) {
   );
 }
 
-export function JobCard({ job, matchScore, isSaved = false, onToggleSave, compact = false }: JobCardProps) {
+export function JobCard({
+  job,
+  matchScore,
+  isSaved = false,
+  onToggleSave,
+  compact = false,
+}: JobCardProps) {
   const salary = formatSalary(job.salary_min, job.salary_max, job.salary_currency);
   const hasSalary = salary !== "Salary not disclosed";
-  const isRemote = job.type === "remote";
 
   return (
     <div className="group relative">
-      {/* Bookmark button — floats top-right, only shown when handler provided */}
+      {/* Save button — sits outside the Link so clicks don't navigate */}
       {onToggleSave && (
         <button
           type="button"
           aria-label={isSaved ? `Unsave ${job.title}` : `Save ${job.title}`}
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onToggleSave(job.id);
           }}
           className={cn(
-            "absolute right-4 top-4 z-10 rounded-md p-1.5 transition-colors",
-            "opacity-0 group-hover:opacity-100 focus:opacity-100",
+            "absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-[2px] border transition-all duration-300",
             isSaved
-              ? "text-primary"
-              : "text-muted-foreground hover:text-primary",
+              ? "border-primary text-primary"
+              : "border-border text-muted-foreground hover:border-primary hover:text-primary",
           )}
         >
           {isSaved ? (
-            <BookmarkCheck className="h-4 w-4 fill-primary" />
+            <BookmarkCheck className="h-4 w-4" />
           ) : (
             <Bookmark className="h-4 w-4" />
           )}
         </button>
       )}
 
-      <Link to="/jobs/$id" params={{ id: job.id }} className="block outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl">
-        <Card
+      <Link
+        to="/jobs/$id"
+        params={{ id: job.id }}
+        className="block rounded-[2px] bg-card outline-none focus-visible:ring-2 focus-visible:ring-ring je-card"
+      >
+        <div
           className={cn(
-            "card-hover border border-border bg-card",
-            "hover:border-primary/30",
-            compact ? "p-4" : "p-5",
+            "flex gap-4 p-5",
+            compact ? "items-start" : "flex-col sm:flex-row sm:items-center",
           )}
-          style={{ boxShadow: "var(--shadow-card-val)" }}
         >
-          <div className="flex items-start gap-4">
-            {/* Company logo */}
-            <CompanyAvatar
-              name={job.companies?.name}
-              logoUrl={job.companies?.logo_url}
-              size={compact ? "sm" : "md"}
-            />
-
-            {/* Content */}
-            <div className="min-w-0 flex-1">
-              {/* Row 1: title + time */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h3
-                    className={cn(
-                      "font-semibold leading-snug group-hover:text-primary transition-colors",
-                      compact ? "text-sm" : "text-base",
-                    )}
-                  >
-                    {job.title}
-                  </h3>
-                  <p className="mt-0.5 text-sm text-muted-foreground truncate">
-                    {job.companies?.name ?? "—"}
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-2 pt-0.5">
-                  {typeof matchScore === "number" && <MatchPill score={matchScore} />}
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                    <Clock className="h-3 w-3" />
-                    {timeAgo(job.created_at)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Row 2: location + badges */}
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                {job.location && (
-                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3 shrink-0" />
-                    <span className="truncate max-w-[140px]">{job.location}</span>
-                  </span>
-                )}
-                <span className="text-muted-foreground/40 text-xs select-none">·</span>
-                <Badge variant={isRemote ? "remote" : "type"} className="text-[11px] py-0 px-2 h-5">
-                  {typeLabel(job.type)}
-                </Badge>
-                {job.experience_level && (
-                  <Badge variant="level" className="text-[11px] py-0 px-2 h-5 capitalize">
-                    {job.experience_level}
-                  </Badge>
-                )}
-              </div>
-
-              {/* Row 3: salary */}
-              {!compact && (
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  {hasSalary ? (
-                    <span className="text-sm font-semibold text-foreground tabular-nums">
-                      {salary}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">Salary not disclosed</span>
+          {/* Company logo — square with border */}
+          <div className="shrink-0">
+            <div
+              className={cn(
+                "flex items-center justify-center rounded-[2px] border-2 border-border bg-background overflow-hidden",
+                compact ? "h-14 w-14" : "h-20 w-20",
+              )}
+            >
+              {job.companies?.logo_url ? (
+                <img
+                  src={job.companies.logo_url}
+                  alt={job.companies.name ?? ""}
+                  className="h-full w-full object-contain p-1.5"
+                />
+              ) : (
+                <span
+                  className={cn(
+                    "font-extrabold text-primary",
+                    compact ? "text-lg" : "text-2xl",
                   )}
-                </div>
+                >
+                  {(job.companies?.name?.[0] ?? "?").toUpperCase()}
+                </span>
               )}
             </div>
           </div>
-        </Card>
+
+          {/* Main content */}
+          <div className="min-w-0 flex-1">
+            {/* Title row */}
+            <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h3
+                  className={cn(
+                    "font-bold text-foreground transition-colors duration-300 group-hover:text-primary",
+                    compact ? "text-sm" : "text-lg",
+                  )}
+                >
+                  {job.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {job.companies?.name ?? "—"}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                {typeof matchScore === "number" && (
+                  <MatchPill score={matchScore} />
+                )}
+                <span className="flex items-center gap-1 whitespace-nowrap text-xs text-muted-foreground">
+                  <Clock className="h-3.5 w-3.5 text-primary" />
+                  {timeAgo(job.created_at)}
+                </span>
+              </div>
+            </div>
+
+            {/* Meta row — green inline icons per JobEntry style */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+              {job.location && (
+                <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                  {job.location}
+                </span>
+              )}
+              <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Briefcase className="h-4 w-4 shrink-0 text-primary" />
+                {typeLabel(job.type)}
+              </span>
+              {hasSalary && (
+                <span className="flex items-center gap-1.5 text-sm font-semibold tabular-nums text-foreground">
+                  <DollarSign className="h-4 w-4 shrink-0 text-primary" />
+                  {salary}
+                </span>
+              )}
+              {job.experience_level && (
+                <Badge
+                  variant="outline"
+                  className="rounded-[2px] border-primary/30 text-xs capitalize text-primary/80"
+                >
+                  {job.experience_level}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Apply CTA — only when save handler present (real job pages) */}
+          {!compact && onToggleSave && (
+            <div className="shrink-0 self-end pr-10 sm:self-center sm:pr-0">
+              <span className="inline-flex items-center rounded-[2px] bg-primary px-5 py-2 text-sm font-bold text-white transition-colors duration-300 group-hover:bg-primary/85">
+                Apply Now
+              </span>
+            </div>
+          )}
+        </div>
       </Link>
     </div>
   );

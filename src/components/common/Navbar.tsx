@@ -1,9 +1,16 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Briefcase, LogOut, Menu, Moon, Sun, User as UserIcon, Search, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {
+  Briefcase,
+  LogOut,
+  ChevronDown,
+  User as UserIcon,
+  Menu,
+  X,
+  Moon,
+  Sun,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +27,10 @@ function useDarkMode() {
   const [dark, setDark] = useState(() => {
     if (typeof window === "undefined") return false;
     const stored = localStorage.getItem("theme");
-    return stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    return (
+      stored === "dark" ||
+      (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    );
   });
 
   useEffect(() => {
@@ -46,17 +56,16 @@ function NavLink({
   onClick?: () => void;
 }) {
   const location = useRouterState({ select: (s) => s.location });
-  const isActive = location.pathname === to || location.pathname.startsWith(to + "/");
-
+  const isActive =
+    location.pathname === to ||
+    (to !== "/" && location.pathname.startsWith(to + "/"));
   return (
     <Link
       to={to}
       onClick={onClick}
       className={cn(
-        "text-sm font-medium transition-colors px-1 py-0.5",
-        isActive
-          ? "text-foreground"
-          : "text-muted-foreground hover:text-foreground",
+        "block text-[13px] font-semibold uppercase tracking-wider transition-colors duration-300",
+        isActive ? "text-primary" : "text-foreground hover:text-primary",
       )}
     >
       {children}
@@ -69,58 +78,39 @@ export function Navbar() {
   const navigate = useNavigate();
   const { dark, toggle } = useDarkMode();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchQ, setSearchQ] = useState("");
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [scrolled, setScrolled] = useState(false);
 
-  const location = useRouterState({ select: (s) => s.location });
-  // Don't show the compact navbar search on the landing page (it has its own hero search)
-  const showNavSearch = location.pathname !== "/";
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (searchQ.trim()) {
-      navigate({ to: "/jobs", search: { q: searchQ } as never });
-      setSearchQ("");
-      searchRef.current?.blur();
-    }
-  }
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 80);
+    handler();
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   const initial = (user?.email?.[0] ?? "U").toUpperCase();
 
-  /* Role-aware navigation links */
-  const seekerLinks = (
-    <>
-      <NavLink to="/jobs" onClick={() => setMobileOpen(false)}>Browse jobs</NavLink>
-      <NavLink to="/companies" onClick={() => setMobileOpen(false)}>Companies</NavLink>
-      <NavLink to="/seeker/applications" onClick={() => setMobileOpen(false)}>Applications</NavLink>
-      <NavLink to="/seeker/saved-jobs" onClick={() => setMobileOpen(false)}>Saved</NavLink>
-    </>
-  );
-
-  const employerLinks = (
-    <>
-      <NavLink to="/jobs" onClick={() => setMobileOpen(false)}>Jobs</NavLink>
-      <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</NavLink>
-      <NavLink to="/employer/jobs" onClick={() => setMobileOpen(false)}>My jobs</NavLink>
-      <NavLink to="/employer/company" onClick={() => setMobileOpen(false)}>Company</NavLink>
-    </>
-  );
-
-  const adminLinks = (
-    <>
-      <NavLink to="/admin/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</NavLink>
-      <NavLink to="/admin/employers" onClick={() => setMobileOpen(false)}>Employers</NavLink>
-      <NavLink to="/admin/users" onClick={() => setMobileOpen(false)}>Users</NavLink>
-      <NavLink to="/admin/jobs" onClick={() => setMobileOpen(false)}>Jobs</NavLink>
-    </>
-  );
-
-  const guestLinks = (
-    <>
-      <NavLink to="/jobs" onClick={() => setMobileOpen(false)}>Browse jobs</NavLink>
-      <NavLink to="/companies" onClick={() => setMobileOpen(false)}>Companies</NavLink>
-    </>
-  );
+  const seekerLinks = [
+    { to: "/jobs", label: "Job List" },
+    { to: "/companies", label: "Companies" },
+    { to: "/seeker/applications", label: "Applications" },
+    { to: "/seeker/saved-jobs", label: "Saved Jobs" },
+  ];
+  const employerLinks = [
+    { to: "/jobs", label: "Browse Jobs" },
+    { to: "/employer/dashboard", label: "Dashboard" },
+    { to: "/employer/jobs", label: "My Jobs" },
+    { to: "/employer/company", label: "Company" },
+  ];
+  const adminLinks = [
+    { to: "/admin/dashboard", label: "Dashboard" },
+    { to: "/admin/users", label: "Users" },
+    { to: "/admin/jobs", label: "Jobs" },
+    { to: "/admin/employers", label: "Employers" },
+  ];
+  const guestLinks = [
+    { to: "/jobs", label: "Job List" },
+    { to: "/companies", label: "Companies" },
+  ];
 
   const navLinks =
     role === "seeker"
@@ -133,79 +123,72 @@ export function Navbar() {
 
   return (
     <header
-      className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm"
-      style={{ boxShadow: "var(--shadow-nav-val)" }}
+      className={cn(
+        "sticky top-0 z-50 w-full bg-background transition-all duration-500",
+        scrolled
+          ? "border-b border-border shadow-[var(--shadow-nav-val)]"
+          : "border-b border-transparent",
+      )}
     >
-      <div className="container mx-auto flex h-16 items-center gap-4 px-4">
-        {/* ── Logo ─────────────────────────────────────────────── */}
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        {/* ── Logo ──────────────────────────────────────────── */}
         <Link
           to="/"
-          className="flex shrink-0 items-center gap-2 font-bold text-lg tracking-tight mr-2"
+          className="flex shrink-0 items-center gap-2 font-extrabold text-xl text-primary"
           aria-label="Hireway home"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <Briefcase className="h-4 w-4" />
-          </span>
-          <span className="hidden sm:inline">Hireway</span>
+          <Briefcase className="h-5 w-5" />
+          <span>Hireway</span>
         </Link>
 
-        {/* ── Compact search (hidden on landing & mobile) ─────── */}
-        {showNavSearch && (
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex flex-1 max-w-sm items-center relative"
-          >
-            <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              ref={searchRef}
-              value={searchQ}
-              onChange={(e) => setSearchQ(e.target.value)}
-              placeholder="Search jobs…"
-              className="pl-9 pr-3 h-9 bg-muted/50 border-transparent focus:border-border focus:bg-background transition-colors"
-            />
-          </form>
-        )}
-
-        {/* ── Primary nav links ─────────────────────────────────── */}
-        <nav className="hidden md:flex items-center gap-5 flex-1 justify-end mr-4">
-          {navLinks}
+        {/* ── Desktop nav ───────────────────────────────────── */}
+        <nav className="hidden lg:flex flex-1 items-center justify-center gap-7">
+          <NavLink to="/">Home</NavLink>
+          {navLinks.map((link) => (
+            <NavLink key={link.to} to={link.to}>
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
 
-        {/* ── Right actions ────────────────────────────────────── */}
-        <div className="flex items-center gap-1 ml-auto md:ml-0">
+        {/* ── Right actions ─────────────────────────────────── */}
+        <div className="flex items-center gap-3">
           {/* Dark mode toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={toggle}
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-            className="h-9 w-9 rounded-full"
+            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-[2px] text-muted-foreground transition-colors hover:text-primary"
           >
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </Button>
+          </button>
 
+          {/* Auth */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="ml-1 flex items-center gap-2 rounded-full p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-ring transition-opacity hover:opacity-90"
+                  className="hidden sm:flex items-center gap-1.5 rounded-[2px] border border-border px-2.5 py-1.5 text-sm transition-colors hover:border-primary/60"
                   aria-label="Account menu"
                 >
-                  <Avatar className="h-8 w-8 border border-border">
+                  <Avatar className="h-6 w-6">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                       {initial}
                     </AvatarFallback>
                   </Avatar>
+                  <span className="hidden md:block max-w-[110px] truncate text-sm font-medium">
+                    {user.email}
+                  </span>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="text-sm font-semibold truncate">
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel className="pb-1 font-normal">
+                  <span className="block text-sm font-semibold truncate">
                     {user.email}
-                  </div>
-                  <div className="text-xs text-muted-foreground truncate capitalize mt-0.5">
+                  </span>
+                  <span className="text-xs text-muted-foreground capitalize">
                     {role ?? "—"}
-                  </div>
+                  </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {role === "seeker" && (
@@ -226,7 +209,7 @@ export function Navbar() {
                   <DropdownMenuItem
                     onClick={() => navigate({ to: "/employer/company" })}
                   >
-                    Company profile
+                    Company Profile
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
@@ -242,120 +225,115 @@ export function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden sm:flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/auth">Sign in</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link to="/auth" search={{ mode: "register" } as never}>
-                  Get started
-                </Link>
-              </Button>
-            </div>
+            <Link
+              to="/auth"
+              className="hidden sm:inline-flex items-center rounded-[2px] border border-border px-4 py-1.5 text-[13px] font-semibold uppercase tracking-wider text-foreground transition-all duration-300 hover:border-primary hover:text-primary"
+            >
+              Sign In
+            </Link>
           )}
+
+          {/* Post A Job CTA */}
+          <Link
+            to={role === "employer" ? "/employer/jobs/new" : "/auth"}
+            search={
+              role === "employer"
+                ? undefined
+                : ({ mode: "register", role: "employer" } as never)
+            }
+            className="hidden sm:flex items-center rounded-[2px] bg-primary px-4 py-2 text-[13px] font-bold uppercase tracking-wider text-white transition-all duration-500 hover:bg-primary/85"
+          >
+            Post A Job
+          </Link>
 
           {/* Mobile hamburger */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden h-9 w-9 rounded-full"
+              <button
+                className="flex h-9 w-9 items-center justify-center rounded-[2px] border border-border lg:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
-              </Button>
+              </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 flex flex-col p-0">
+            <SheetContent side="left" className="flex w-72 flex-col p-0">
               {/* Mobile header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b">
+              <div className="flex items-center justify-between border-b px-5 py-4">
                 <Link
                   to="/"
-                  className="flex items-center gap-2 font-bold"
+                  className="flex items-center gap-2 font-extrabold text-lg text-primary"
                   onClick={() => setMobileOpen(false)}
                 >
-                  <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground">
-                    <Briefcase className="h-3.5 w-3.5" />
-                  </span>
+                  <Briefcase className="h-5 w-5" />
                   Hireway
                 </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
                   onClick={() => setMobileOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-[2px] text-muted-foreground hover:text-primary"
                   aria-label="Close menu"
-                  className="h-8 w-8"
                 >
                   <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Mobile search */}
-              <div className="px-5 py-3 border-b">
-                <form
-                  onSubmit={(e) => {
-                    handleSearch(e);
-                    setMobileOpen(false);
-                  }}
-                  className="relative"
-                >
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    value={searchQ}
-                    onChange={(e) => setSearchQ(e.target.value)}
-                    placeholder="Search jobs…"
-                    className="pl-9 h-9"
-                  />
-                </form>
+                </button>
               </div>
 
               {/* Mobile nav */}
-              <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-                {navLinks}
+              <nav className="flex-1 space-y-1 overflow-y-auto px-5 py-4">
+                <NavLink to="/" onClick={() => setMobileOpen(false)}>
+                  Home
+                </NavLink>
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
               </nav>
 
-              {/* Mobile footer actions */}
-              <div className="px-5 py-4 border-t space-y-2">
-                {!user && (
+              {/* Mobile footer */}
+              <div className="space-y-2 border-t px-5 py-4">
+                {!user ? (
                   <>
-                    <Button className="w-full" asChild>
-                      <Link to="/auth" onClick={() => setMobileOpen(false)}>
-                        Sign in
-                      </Link>
-                    </Button>
-                    <Button variant="outline" className="w-full" asChild>
-                      <Link
-                        to="/auth"
-                        search={{ mode: "register" } as never}
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        Create account
-                      </Link>
-                    </Button>
+                    <Link
+                      to="/auth"
+                      className="block w-full rounded-[2px] bg-primary px-4 py-2.5 text-center text-sm font-bold uppercase tracking-wider text-white"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Post A Job
+                    </Link>
+                    <Link
+                      to="/auth"
+                      className="block w-full rounded-[2px] border border-border px-4 py-2.5 text-center text-sm font-semibold uppercase tracking-wider transition-colors hover:border-primary hover:text-primary"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Sign In
+                    </Link>
                   </>
-                )}
-                {user && (
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-destructive hover:text-destructive"
+                ) : (
+                  <button
                     onClick={async () => {
                       await signOut();
                       setMobileOpen(false);
                       navigate({ to: "/" });
                     }}
+                    className="flex w-full items-center gap-2 rounded-[2px] border border-destructive/30 px-4 py-2 text-sm text-destructive"
                   >
-                    <LogOut className="mr-2 h-4 w-4" /> Sign out
-                  </Button>
+                    <LogOut className="h-4 w-4" /> Sign out
+                  </button>
                 )}
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={toggle}
-                  className="w-full justify-start"
+                  className="flex w-full items-center gap-2 rounded-[2px] border border-border px-4 py-2 text-sm text-muted-foreground"
                 >
-                  {dark ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                  {dark ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
                   {dark ? "Light mode" : "Dark mode"}
-                </Button>
+                </button>
               </div>
             </SheetContent>
           </Sheet>

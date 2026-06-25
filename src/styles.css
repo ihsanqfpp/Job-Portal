@@ -5,14 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Fonts: Heebo for body text, Inter for headings/buttons */
+  --font-sans:    "Heebo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  /* Radius scale */
-  --radius-sm:   calc(var(--radius) - 4px);
-  --radius-md:   calc(var(--radius) - 2px);
-  --radius-lg:   var(--radius);
-  --radius-xl:   calc(var(--radius) + 4px);
-  --radius-2xl:  calc(var(--radius) + 8px);
+  /* Radius – 2px globally (JobEntry sharp corners) */
+  --radius-sm:   0.125rem;
+  --radius-md:   0.125rem;
+  --radius-lg:   0.125rem;
+  --radius-xl:   0.125rem;
+  --radius-2xl:  0.25rem;
 
   /* Semantic color aliases → Tailwind utility classes */
   --color-background:               var(--background);
@@ -52,10 +54,14 @@
   --color-sidebar-border:           var(--sidebar-border);
   --color-sidebar-ring:             var(--sidebar-ring);
 
-  /* Surface tokens: subtle background hierarchy */
+  /* Surface tokens */
   --color-surface-0: var(--surface-0);
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
+
+  /* JobEntry brand tokens */
+  --color-je-dark:  var(--je-dark);
+  --color-je-light: var(--je-light);
 
   /* Shadow tokens */
   --shadow-card:       var(--shadow-card-val);
@@ -66,111 +72,118 @@
 
 /* ── Light mode ──────────────────────────────────────────────────────────── */
 :root {
-  --radius: 0.625rem;
+  --radius: 0.125rem;
 
-  /* Core palette */
   --background:              oklch(1 0 0);
   --foreground:              oklch(0.18 0.03 260);
   --card:                    oklch(1 0 0);
   --card-foreground:         oklch(0.18 0.03 260);
   --popover:                 oklch(1 0 0);
   --popover-foreground:      oklch(0.18 0.03 260);
-  --primary:                 oklch(0.55 0.21 259);
-  --primary-foreground:      oklch(0.99 0 0);
-  --secondary:               oklch(0.97 0.01 260);
-  --secondary-foreground:    oklch(0.22 0.04 260);
-  --muted:                   oklch(0.97 0.01 260);
-  --muted-foreground:        oklch(0.5 0.03 260);
-  --accent:                  oklch(0.95 0.03 259);
-  --accent-foreground:       oklch(0.32 0.12 259);
+
+  /* Primary → JobEntry green #00B074 */
+  --primary:                 oklch(0.636 0.173 163);
+  --primary-foreground:      oklch(1 0 0);
+
+  --secondary:               oklch(0.97 0.01 163);
+  --secondary-foreground:    oklch(0.22 0.05 163);
+  --muted:                   oklch(0.96 0.005 163);
+  --muted-foreground:        oklch(0.50 0.02 163);
+  --accent:                  oklch(0.95 0.02 163);
+  --accent-foreground:       oklch(0.28 0.07 163);
   --destructive:             oklch(0.6 0.23 27);
   --destructive-foreground:  oklch(0.99 0 0);
-  --success:                 oklch(0.55 0.18 150);
+  --success:                 oklch(0.636 0.173 163);
   --success-foreground:      oklch(0.99 0 0);
   --warning:                 oklch(0.72 0.18 70);
   --warning-foreground:      oklch(0.25 0.06 70);
-  --border:                  oklch(0.92 0.01 260);
-  --input:                   oklch(0.92 0.01 260);
-  --ring:                    oklch(0.55 0.21 259);
+  --border:                  oklch(0.91 0.01 163);
+  --input:                   oklch(0.91 0.01 163);
+  --ring:                    oklch(0.636 0.173 163);
 
-  /* Chart */
-  --chart-1: oklch(0.55 0.21 259);
-  --chart-2: oklch(0.65 0.17 150);
+  --chart-1: oklch(0.636 0.173 163);
+  --chart-2: oklch(0.660 0.190 251);
   --chart-3: oklch(0.78 0.16 70);
   --chart-4: oklch(0.6 0.23 27);
   --chart-5: oklch(0.55 0.18 300);
 
-  /* Sidebar */
-  --sidebar:                         oklch(0.985 0.002 260);
-  --sidebar-foreground:              oklch(0.18 0.03 260);
-  --sidebar-primary:                 oklch(0.55 0.21 259);
-  --sidebar-primary-foreground:      oklch(0.99 0 0);
-  --sidebar-accent:                  oklch(0.95 0.03 259);
-  --sidebar-accent-foreground:       oklch(0.32 0.12 259);
-  --sidebar-border:                  oklch(0.92 0.01 260);
-  --sidebar-ring:                    oklch(0.55 0.21 259);
+  --sidebar:                           oklch(0.985 0.003 163);
+  --sidebar-foreground:                oklch(0.18 0.03 260);
+  --sidebar-primary:                   oklch(0.636 0.173 163);
+  --sidebar-primary-foreground:        oklch(1 0 0);
+  --sidebar-accent:                    oklch(0.95 0.02 163);
+  --sidebar-accent-foreground:         oklch(0.28 0.07 163);
+  --sidebar-border:                    oklch(0.91 0.01 163);
+  --sidebar-ring:                      oklch(0.636 0.173 163);
 
-  /* Surface hierarchy */
-  --surface-0: oklch(0.985 0.003 260);   /* page bg (faint gray-blue tint) */
-  --surface-1: oklch(1 0 0);             /* card bg (white) */
-  --surface-2: oklch(0.98 0.004 260);    /* recessed / table-row alt */
+  /* Surface hierarchy – lightest green tint for page bg */
+  --surface-0: oklch(0.978 0.025 158);
+  --surface-1: oklch(1 0 0);
+  --surface-2: oklch(0.97 0.015 158);
 
-  /* Shadows */
-  --shadow-card-val:       0 1px 3px oklch(0 0 0 / 0.07), 0 1px 2px oklch(0 0 0 / 0.04);
-  --shadow-card-hover-val: 0 4px 16px oklch(0 0 0 / 0.10), 0 2px 6px oklch(0 0 0 / 0.06);
-  --shadow-popover-val:    0 10px 25px oklch(0 0 0 / 0.12), 0 4px 8px oklch(0 0 0 / 0.06);
-  --shadow-nav-val:        0 1px 0 oklch(0 0 0 / 0.08);
+  /* JobEntry brand */
+  --je-dark:  oklch(0.280 0.027 214);   /* #2B3940 */
+  --je-light: oklch(0.978 0.025 158);   /* #EFFDF5 */
+
+  /* Shadows – JobEntry style */
+  --shadow-card-val:       0 0 45px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover-val: none;
+  --shadow-popover-val:    0 10px 25px rgba(0, 0, 0, 0.12);
+  --shadow-nav-val:        0 2px 30px rgba(0, 0, 0, 0.10);
 }
 
 /* ── Dark mode ───────────────────────────────────────────────────────────── */
 .dark {
-  --background:              oklch(0.155 0.02 260);
+  --background:              oklch(0.155 0.02 214);
   --foreground:              oklch(0.96 0 0);
-  --card:                    oklch(0.205 0.02 260);
+  --card:                    oklch(0.205 0.02 214);
   --card-foreground:         oklch(0.96 0 0);
-  --popover:                 oklch(0.205 0.02 260);
+  --popover:                 oklch(0.205 0.02 214);
   --popover-foreground:      oklch(0.96 0 0);
-  --primary:                 oklch(0.68 0.18 259);
-  --primary-foreground:      oklch(0.14 0.025 260);
-  --secondary:               oklch(0.255 0.025 260);
+  --primary:                 oklch(0.73 0.16 163);
+  --primary-foreground:      oklch(0.14 0.03 163);
+  --secondary:               oklch(0.255 0.025 214);
   --secondary-foreground:    oklch(0.96 0 0);
-  --muted:                   oklch(0.255 0.025 260);
-  --muted-foreground:        oklch(0.65 0.02 260);
-  --accent:                  oklch(0.295 0.055 260);
+  --muted:                   oklch(0.255 0.025 214);
+  --muted-foreground:        oklch(0.65 0.02 214);
+  --accent:                  oklch(0.295 0.055 163);
   --accent-foreground:       oklch(0.94 0 0);
   --destructive:             oklch(0.62 0.22 27);
   --destructive-foreground:  oklch(0.96 0 0);
-  --success:                 oklch(0.65 0.17 150);
-  --success-foreground:      oklch(0.14 0.025 260);
+  --success:                 oklch(0.73 0.16 163);
+  --success-foreground:      oklch(0.14 0.03 163);
   --warning:                 oklch(0.76 0.17 70);
   --warning-foreground:      oklch(0.14 0.025 260);
   --border:                  oklch(1 0 0 / 0.1);
   --input:                   oklch(1 0 0 / 0.12);
-  --ring:                    oklch(0.68 0.18 259);
+  --ring:                    oklch(0.73 0.16 163);
 
-  --chart-1: oklch(0.68 0.18 259);
-  --chart-2: oklch(0.68 0.17 150);
+  --chart-1: oklch(0.73 0.16 163);
+  --chart-2: oklch(0.68 0.17 251);
   --chart-3: oklch(0.76 0.17 70);
   --chart-4: oklch(0.62 0.22 27);
   --chart-5: oklch(0.62 0.18 300);
 
-  --sidebar:                         oklch(0.18 0.02 260);
-  --sidebar-foreground:              oklch(0.96 0 0);
-  --sidebar-primary:                 oklch(0.68 0.18 259);
-  --sidebar-primary-foreground:      oklch(0.14 0.025 260);
-  --sidebar-accent:                  oklch(0.295 0.055 260);
-  --sidebar-accent-foreground:       oklch(0.94 0 0);
-  --sidebar-border:                  oklch(1 0 0 / 0.1);
-  --sidebar-ring:                    oklch(0.68 0.18 259);
+  --sidebar:                           oklch(0.18 0.02 214);
+  --sidebar-foreground:                oklch(0.96 0 0);
+  --sidebar-primary:                   oklch(0.73 0.16 163);
+  --sidebar-primary-foreground:        oklch(0.14 0.03 163);
+  --sidebar-accent:                    oklch(0.295 0.055 163);
+  --sidebar-accent-foreground:         oklch(0.94 0 0);
+  --sidebar-border:                    oklch(1 0 0 / 0.1);
+  --sidebar-ring:                      oklch(0.73 0.16 163);
 
-  --surface-0: oklch(0.155 0.02 260);
-  --surface-1: oklch(0.205 0.02 260);
-  --surface-2: oklch(0.235 0.02 260);
+  --surface-0: oklch(0.155 0.02 214);
+  --surface-1: oklch(0.205 0.02 214);
+  --surface-2: oklch(0.235 0.02 214);
 
-  --shadow-card-val:       0 1px 3px oklch(0 0 0 / 0.25), 0 1px 2px oklch(0 0 0 / 0.15);
-  --shadow-card-hover-val: 0 4px 16px oklch(0 0 0 / 0.35), 0 2px 6px oklch(0 0 0 / 0.2);
-  --shadow-popover-val:    0 10px 25px oklch(0 0 0 / 0.4), 0 4px 8px oklch(0 0 0 / 0.25);
-  --shadow-nav-val:        0 1px 0 oklch(0 0 0 / 0.3);
+  --je-dark:  oklch(0.280 0.027 214);
+  --je-light: oklch(0.30 0.03 214);
+
+  --shadow-card-val:       0 0 45px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover-val: none;
+  --shadow-popover-val:    0 10px 25px rgba(0, 0, 0, 0.4);
+  --shadow-nav-val:        0 2px 30px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
@@ -181,18 +194,19 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
-  h1, h2, h3, h4 {
-    letter-spacing: -0.02em;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
     line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
-  /* Visible focus ring for keyboard users */
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
@@ -201,29 +215,54 @@
 
 /* ── Utilities ────────────────────────────────────────────────────────────── */
 @layer utilities {
-  /* Page-level fade-in — use on route root divs */
   .page-fade {
     animation: page-fade-in 0.25s ease-out both;
   }
 
-  /* Subtle card lift on hover — compose with transition-all */
+  /* JobEntry card: shadow transitions to faint border on hover */
+  .je-card {
+    box-shadow: var(--shadow-card-val);
+    border: 1px solid transparent;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .je-card:hover {
+    box-shadow: none;
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* JobEntry heading accent: thick left border + two corner bars */
+  .je-heading-accent {
+    position: relative;
+    padding-left: 1.5rem;
+    border-left: 15px solid var(--primary);
+  }
+  .je-heading-accent::before,
+  .je-heading-accent::after {
+    content: '';
+    position: absolute;
+    left: -15px;
+    width: 100px;
+    height: 15px;
+    background-color: var(--primary);
+    opacity: 0.45;
+  }
+  .je-heading-accent::before { top: -15px; }
+  .je-heading-accent::after  { bottom: -15px; }
+
+  /* Legacy helpers kept for other pages */
   .card-hover {
-    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
   }
   .card-hover:hover {
     box-shadow: var(--shadow-card-hover-val);
-    transform: translateY(-1px);
   }
 
-  /* Portal page background uses --surface-0 (slightly tinted) */
   .portal-bg {
     background-color: var(--color-surface-0);
   }
 
-  /* Pill shape helper */
   .pill { border-radius: 9999px; }
 
-  /* Truncate with ellipsis — standard helper */
   .truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -238,7 +277,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Reduced-motion ────────────────────────────────────────────────────────── */
+/* ── Reduced-motion ─────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
