@@ -706,6 +706,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      complete_onboarding: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] };
+        Returns: undefined;
+      };
       approve_company: { Args: { _company_id: string }; Returns: undefined };
       atomic_check_increment_quota: {
         Args: { p_user_id: string; p_quota_key: string; p_limit: number };

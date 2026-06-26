@@ -12,4 +12,13 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    optimizeDeps: {
+      // @react-pdf/renderer's default entry imports Node.js 'fs'.
+      // Force esbuild to pre-bundle it using the browser-safe entry
+      // (resolved via the package's own "browser" field) so Vite never
+      // tries to serve the Node.js build to the browser on-demand.
+      include: ["@react-pdf/renderer"],
+    },
+  },
 });

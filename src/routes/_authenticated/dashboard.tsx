@@ -80,7 +80,7 @@ function SeekerDashboard() {
     queryKey: ["profile", user?.id],
     enabled: !!user,
     queryFn: async () =>
-      (await supabase.from("profiles").select("*").eq("id", user!.id).single()).data,
+      (await supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle()).data,
   });
 
   const p = profile.data;

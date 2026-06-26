@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const best = [...roles].sort((a, b) => rank[a.role as AppRole] - rank[b.role as AppRole])[0];
       setRole(best.role as AppRole);
     }
-    setOnboardingCompleted(profile?.onboarding_completed ?? null);
+    setOnboardingCompleted(profile?.onboarding_completed ?? false);
   }
 
   useEffect(() => {

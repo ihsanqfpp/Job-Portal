@@ -15,6 +15,7 @@ import { FeatureErrorBoundary } from "@/components/ui/FeatureErrorBoundary";
 import { ResumeUploader } from "@/components/ResumeUploader";
 
 export const Route = createFileRoute("/_authenticated/seeker/resume-analyzer")({
+  ssr: false, // @react-pdf/renderer imports 'fs' — must not run during SSR
   component: ResumeAnalyzerPage,
   errorComponent: () => (
     <FeatureErrorBoundary fallback={null}>
@@ -115,7 +116,7 @@ function ResumeAnalyzerPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResumeUploader onSuccess={(versionId) => {
+            <ResumeUploader onSuccess={() => {
               resumeVersions.refetch();
             }} />
           </CardContent>

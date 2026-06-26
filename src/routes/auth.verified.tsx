@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
@@ -25,6 +24,7 @@ function AuthVerifiedPage() {
 
   useEffect(() => {
     if (loading) return;
+    if (onboardingCompleted === null) return; // loadRole still in-flight, don't enable button yet
     setChecking(false);
   }, [loading, onboardingCompleted]);
 
@@ -36,7 +36,7 @@ function AuthVerifiedPage() {
   }
 
   function handleContinue() {
-    if (onboardingCompleted === false) {
+    if (onboardingCompleted !== true) {
       navigate({ to: "/onboarding", replace: true });
     } else {
       navigate({ to: dashboardFor(role, search.redirect), replace: true });
@@ -52,7 +52,7 @@ function AuthVerifiedPage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Account Verified</h1>
           <p className="text-sm text-muted-foreground leading-normal">
-            {onboardingCompleted === false
+            {onboardingCompleted !== true
               ? "One last step — tell us how you'll use JobVerse."
               : "Your account is confirmed. Welcome back."}
           </p>
@@ -64,7 +64,7 @@ function AuthVerifiedPage() {
         >
           {loading || checking
             ? "Loading…"
-            : onboardingCompleted === false
+            : onboardingCompleted !== true
               ? "Choose your role →"
               : "Go to dashboard"}
         </Button>
